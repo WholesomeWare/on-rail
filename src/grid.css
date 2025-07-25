@@ -4,15 +4,12 @@
 .row {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px; /* Default gap */
     box-sizing: border-box;
-}
-.row.no-gap {
-    gap: 0;
 }
 
 /* Columns */
 [class^="col-"] {
+    display: inline-block;
     box-sizing: border-box;
     flex: 0 0 auto;
 }
@@ -30,7 +27,7 @@
 .col-s-11 { width: 91.6667%; }
 .col-s-12 { width: 100%; }
 
-@media (min-width: 600px) and (max-width: 991px) {
+@media (min-width: 600px) {
     .col-m-1  { width: 8.3333%; }
     .col-m-2  { width: 16.6667%; }
     .col-m-3  { width: 25%; }

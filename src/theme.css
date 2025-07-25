@@ -1,6 +1,7 @@
 :root {
     --spacing: .5rem;
     --spacing-double: 1rem;
+    --radius: 1.7rem;
 
     --colorDelayNone: #66A182;
     --onColorDelayNone: #D0E6DA;
@@ -48,29 +49,6 @@
     --surfaceContainerHighest: #E1E2EB;
 }
 
-.surface-container {
-    background-color: var(--surfaceContainer);
-    color: var(--onSurface);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-
-    &.elevation-n2 {
-        background-color: var(--surfaceContainerLowest);
-        box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
-    }
-    &.elevation-n1 {
-        background-color: var(--surfaceContainerLow);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-    }
-    &.elevation-1 {
-        background-color: var(--surfaceContainerHigh);
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.8);
-    }
-    &.elevation-2 {
-        background-color: var(--surfaceContainerHighest);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 1);
-    }
-}
-
 @media (prefers-color-scheme: dark) {
     :root {
         --primary: #AFC6FF;
@@ -109,4 +87,42 @@
         --surfaceContainerHigh: #282A31;
         --surfaceContainerHighest: #32353C;
     }
+}
+
+.surface-container {
+    background-color: var(--surfaceContainer);
+    color: var(--onSurface);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+
+    &.elevation-n2 {
+        background-color: var(--surfaceContainerLowest);
+        box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+    }
+    &.elevation-n1 {
+        background-color: var(--surfaceContainerLow);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    }
+    &.elevation-1 {
+        background-color: var(--surfaceContainerHigh);
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.8);
+    }
+    &.elevation-2 {
+        background-color: var(--surfaceContainerHighest);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 1);
+    }
+}
+
+/** Must be used with `.surface-container` */
+.card {
+    padding: var(--spacing);
+    border-radius: var(--radius);
+}
+
+input, select {
+    background-color: var(--surfaceVariant);
+    color: var(--onSurfaceVariant);
+    padding: var(--spacing);
+    outline: none;
+    border: none;
+    border-radius: var(--radius);
 }
