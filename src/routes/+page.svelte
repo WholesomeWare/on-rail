@@ -12,8 +12,9 @@
                 <h3>Sínen Vagyunk</h3>
                 <p>Adatok nem elérhetők</p>
             </div>
-            <button> Profil </button>
+            <button class="fab elevation-0"> Profil </button>
         </header>
+        <!-- TODO: MÁVINFORM hírek -->
     </div>
     <div class="bottom">
         <div class="surface-container card">
@@ -48,6 +49,7 @@
     header {
         display: flex;
         flex-direction: row;
+        align-items: center;
         gap: var(--spacing);
     }
 </style>

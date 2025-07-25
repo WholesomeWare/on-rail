@@ -14,6 +14,9 @@
     flex: 0 0 auto;
 }
 
+.display-s-none { display: none; }
+.display-s-block { display: block; }
+
 .col-s-1  { width: 8.3333%; }
 .col-s-2  { width: 16.6667%; }
 .col-s-3  { width: 25%; }
@@ -28,6 +31,9 @@
 .col-s-12 { width: 100%; }
 
 @media (min-width: 600px) {
+    .display-m-none { display: none; }
+    .display-m-block { display: block; }
+
     .col-m-1  { width: 8.3333%; }
     .col-m-2  { width: 16.6667%; }
     .col-m-3  { width: 25%; }
@@ -43,6 +49,9 @@
 }
 
 @media (min-width: 992px) {
+    .display-l-none { display: none; }
+    .display-l-block { display: block; }
+
     .col-l-1  { width: 8.3333%; }
     .col-l-2  { width: 16.6667%; }
     .col-l-3  { width: 25%; }

@@ -89,6 +89,26 @@
     }
 }
 
+.elevation-n2 {
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+}
+
+.elevation-n1 {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.elevation-0 {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.elevation-1 {
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.8);
+}
+
+.elevation-2 {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 1);
+}
+
 .surface-container {
     background-color: var(--surfaceContainer);
     color: var(--onSurface);
@@ -96,19 +116,18 @@
 
     &.elevation-n2 {
         background-color: var(--surfaceContainerLowest);
-        box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
     }
+
     &.elevation-n1 {
         background-color: var(--surfaceContainerLow);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
     }
+
     &.elevation-1 {
         background-color: var(--surfaceContainerHigh);
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.8);
     }
+
     &.elevation-2 {
         background-color: var(--surfaceContainerHighest);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 1);
     }
 }
 
@@ -118,7 +137,29 @@
     border-radius: var(--radius);
 }
 
-input, select {
+button {
+    appearance: none;
+    background-color: var(--primary);
+    color: var(--onPrimary);
+    border: none;
+    border-radius: var(--radius);
+    padding: var(--spacing);
+    cursor: pointer;
+}
+
+.fab {
+    background-color: var(--primaryContainer);
+    color: var(--onPrimaryContainer);
+    width: 56px;
+    height: 56px;
+
+    &.extended {
+        width: 128px;
+    }
+}
+
+input,
+select {
     background-color: var(--surfaceVariant);
     color: var(--onSurfaceVariant);
     padding: var(--spacing);
