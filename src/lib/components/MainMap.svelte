@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Mavinform from "$lib/sources/Mavinform";
     import { onMount } from "svelte";
 
     const {
@@ -16,7 +17,7 @@
     });
 </script>
 
-<div {...rest}>
+<div class="map-container" {...rest}>
     {#if !isLoaded}
         <p>Loading map...</p>
     {:else}
@@ -24,12 +25,30 @@
             options={{
                 center: [47.1625, 19.5033],
                 zoom: 7,
+                zoomControl: false,
             }}
         >
             <sveaflet.TileLayer
                 url={"https://tile.openstreetmap.org/{z}/{x}/{y}.png"}
             />
-            <sveaflet.Marker latLng={[51.505, -0.09]} />
+            {#each Mavinform.Territory.values as territory}
+                <sveaflet.Marker
+                    latLng={[territory.latLng.lat, territory.latLng.lng]}
+                    options={{
+                        title: territory.displayName,
+                    }}
+                    onclick={() => {
+                        window.open(territory.getUrl(), "_blank");
+                    }}
+                />
+            {/each}
         </sveaflet.Map>
     {/if}
 </div>
+
+<style>
+    .map-container {
+        width: 100%;
+        height: 100%;
+    }
+</style>

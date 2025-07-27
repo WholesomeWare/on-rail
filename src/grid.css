@@ -30,7 +30,7 @@
 .col-s-11 { width: 91.6667%; }
 .col-s-12 { width: 100%; }
 
-@media (min-width: 600px) {
+@media (min-width: 720px) {
     .display-m-none { display: none; }
     .display-m-block { display: block; }
 
@@ -48,7 +48,7 @@
     .col-m-12 { width: 100%; }
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1024px) {
     .display-l-none { display: none; }
     .display-l-block { display: block; }
 

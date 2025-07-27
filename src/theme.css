@@ -133,8 +133,12 @@
 
 /** Must be used with `.surface-container` */
 .card {
-    padding: var(--spacing);
     border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.padding {
+    padding: var(--spacing);
 }
 
 button {
@@ -145,6 +149,27 @@ button {
     border-radius: var(--radius);
     padding: var(--spacing);
     cursor: pointer;
+}
+
+button.toggle-off {
+    background-color: var(--surfaceVariant);
+    color: var(--onSurfaceVariant);
+}
+
+button.leading {
+    border-radius: var(--radius);
+    border-top-right-radius: calc(var(--radius) * 0.5);
+    border-bottom-right-radius: calc(var(--radius) * 0.5);
+}
+
+button.middle {
+    border-radius: calc(var(--radius) * 0.5);
+}
+
+button.trailing {
+    border-radius: var(--radius);
+    border-top-left-radius: calc(var(--radius) * 0.5);
+    border-bottom-left-radius: calc(var(--radius) * 0.5);
 }
 
 .fab {
