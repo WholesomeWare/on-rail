@@ -3,8 +3,10 @@
     import { onMount } from "svelte";
 
     const {
+        filter,
         ...rest
     }: {
+        filter: "trainsAll" | "trainsSaved" | "trainsActive" | "territoriesAll";
         [key: string]: any;
     } = $props();
 
@@ -31,17 +33,19 @@
             <sveaflet.TileLayer
                 url={"https://tile.openstreetmap.org/{z}/{x}/{y}.png"}
             />
-            {#each Mavinform.Territory.values as territory}
-                <sveaflet.Marker
-                    latLng={[territory.latLng.lat, territory.latLng.lng]}
-                    options={{
-                        title: territory.displayName,
-                    }}
-                    onclick={() => {
-                        window.open(territory.getUrl(), "_blank");
-                    }}
-                />
-            {/each}
+            {#if filter === "territoriesAll"}
+                {#each Mavinform.Territory.values as territory}
+                    <sveaflet.Marker
+                        latLng={[territory.latLng.lat, territory.latLng.lng]}
+                        options={{
+                            title: territory.displayName,
+                        }}
+                        onclick={() => {
+                            window.open(territory.getUrl(), "_blank");
+                        }}
+                    />
+                {/each}
+            {/if}
         </sveaflet.Map>
     {/if}
 </div>

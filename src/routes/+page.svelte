@@ -1,14 +1,15 @@
-<script>
+<script lang="ts">
     import MainMap from "$lib/components/MainMap.svelte";
 
     const TAB_MAP = "map";
     const TAB_MAVINFORM = "mavinform";
 
-    let selectedTab = $state(TAB_MAP);
+    let selectedTab: "map" | "mavinform" = $state(TAB_MAP);
+    let selectedFilter: "trainsAll" | "trainsSaved" | "trainsActive" | "territoriesAll" = $state("trainsAll");
 </script>
 
 <div id="main-map">
-    <MainMap />
+    <MainMap filter={selectedFilter} />
 </div>
 <main class="col-s-12 col-m-6 col-l-4" style="z-index: 2;">
     <div class="top">
@@ -53,11 +54,11 @@
                     class="col-s-12 col-m-6"
                     placeholder="Keresés járatszám vagy végállomás alapján"
                 />
-                <select class="col-s-12 col-m-6">
+                <select class="col-s-12 col-m-6" bind:value={selectedFilter}>
                     <option value="trainsAll">Összes vonat</option>
                     <option value="trainsSaved">Mentett vonatok</option>
                     <option value="trainsActive">Aktív vonatok</option>
-                    <option value="territoryAll">Területek</option>
+                    <option value="territoriesAll">Területek</option>
                 </select>
             </div>
         </div>
