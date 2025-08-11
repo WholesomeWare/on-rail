@@ -1,22 +1,114 @@
 <script lang="ts">
     import MainMap from "$lib/components/MainMap.svelte";
+    import TrainsProvider, { type TrainsData } from "$lib/sources/TrainsProvider";
+    import type { EmmaVehiclePosition } from "$lib/model/EMMATypes";
+    import { onMount } from "svelte";
+    import { browser } from '$app/environment';
 
     const TAB_MAP = "map";
     const TAB_MAVINFORM = "mavinform";
 
     let selectedTab: "map" | "mavinform" = $state(TAB_MAP);
     let selectedFilter: "trainsAll" | "trainsSaved" | "trainsActive" | "territoriesAll" = $state("trainsAll");
+    
+    // Train data state
+    let trainsData: TrainsData = $state({ trains: [], lastUpdated: 0 });
+    let isLoadingTrains: boolean = $state(false);
+    let error: string | null = $state(null);
+
+    // Filtered vehicles based on current filter
+    let filteredVehicles: EmmaVehiclePosition[] = $derived.by(() => {
+        if (!selectedFilter.startsWith('trains')) return [];
+        
+        switch (selectedFilter) {
+            case 'trainsAll':
+                return trainsData.trains;
+            case 'trainsSaved':
+                // TODO: Implement saved trains filtering
+                return trainsData.trains.filter(train => 
+                    train.trip.tripShortName?.toLowerCase().includes('ic') || 
+                    train.trip.tripShortName?.toLowerCase().includes('ec')
+                );
+            case 'trainsActive':
+                // TODO: Implement active trains filtering (maybe based on recent updates or movement)
+                return trainsData.trains.filter(train => train.speed > 0);
+            default:
+                return trainsData.trains;
+        }
+    });
+
+    async function loadTrains() {
+        if (!browser) return;
+        
+        isLoadingTrains = true;
+        error = null;
+        
+        try {
+            const data = await TrainsProvider.getTrains();
+            trainsData = data;
+            console.log(`Loaded ${data.trains.length} trains, last updated: ${new Date(data.lastUpdated).toLocaleString()}`);
+        } catch (err) {
+            console.error('Error loading trains:', err);
+            error = 'Failed to load train data';
+            trainsData = { trains: [], lastUpdated: 0 };
+        } finally {
+            isLoadingTrains = false;
+        }
+    }
+
+    function getStatusText(): string {
+        if (isLoadingTrains) return "Adatok betöltése...";
+        if (error) return `Hiba: ${error}`;
+        if (!selectedFilter.startsWith('trains')) return "Területek megtekintése";
+        
+        const count = filteredVehicles.length;
+        const lastUpdated = trainsData.lastUpdated;
+        
+        if (count === 0) return "Nincs elérhető vonat";
+        
+        const updateText = lastUpdated > 0 
+            ? ` • Frissítve: ${new Date(lastUpdated).toLocaleTimeString()}`
+            : '';
+            
+        return `${count} vonat${updateText}`;
+    }
+
+    onMount(() => {
+        // Load trains on mount if needed
+        if (selectedFilter.startsWith('trains')) {
+            loadTrains();
+        }
+    });
+
+    // Reactive: reload trains when filter changes
+    $effect(() => {
+        if (browser && selectedFilter.startsWith('trains')) {
+            loadTrains();
+        }
+    });
 </script>
 
 <div id="main-map">
-    <MainMap filter={selectedFilter} />
+    <MainMap filter={selectedFilter} vehicles={filteredVehicles} />
 </div>
 <main class="col-s-12 col-m-6 col-l-4" style="z-index: 2;">
     <div class="top">
         <header>
-            <div class="surface-container card padding" style="flex: 1;">
-                <h3>Sínen Vagyunk</h3>
-                <p>Adatok nem elérhetők</p>
+            <div class="surface-container card padding row" style="flex: 1;">
+                <div style="flex: 1;">
+                    <h3>Sínen Vagyunk</h3>
+                    <p>{getStatusText()}</p>
+                </div>
+                {#if selectedFilter.startsWith('trains') && !isLoadingTrains && !error}
+                    <button 
+                        class="refresh-btn"
+                        onclick={loadTrains}
+                        disabled={isLoadingTrains}
+                        title="Adatok frissítése"
+                    >
+                        {isLoadingTrains ? '🔄' : '↻'}
+                    </button>
+                {/if}
             </div>
             <button class="fab elevation-0"> Profil </button>
         </header>

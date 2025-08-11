@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import type { EmmaVehiclePosition } from "$lib/model/EMMATypes";
 
 interface GraphQLResponse {
@@ -13,7 +14,10 @@ interface GraphQLResponse {
  * It cannot be instantiated.
  */
 export class EMMA {
-	private static readonly BASE_URL = 'https://emma.mav.hu/otp2-backend/otp/routers/default/index/graphql';
+	// Use development proxy in dev mode, CORS proxy in production
+	private static readonly BASE_URL = dev 
+		? '/api/emma'  // Development proxy
+		: 'https://corsproxy.io/?https://emma.mav.hu/otp2-backend/otp/routers/default/index/graphql';  // Production CORS proxy
 
 	/**
 	 * Private constructor to prevent instantiation of this static class.
@@ -49,6 +53,9 @@ export class EMMA {
             }
         }`;
 
+		console.log(`Fetching trains from: ${this.BASE_URL}`);
+		console.log(`Environment: ${dev ? 'development' : 'production'}`);
+
 		try {
 			const response = await fetch(this.BASE_URL, {
 				method: 'POST',
@@ -61,11 +68,23 @@ export class EMMA {
 
 			if (!response.ok) {
 				console.error(`EMMA API request failed: ${response.status} ${response.statusText}`);
+				
+				// Try to get more details about the error
+				const errorText = await response.text();
+				console.error('Error response body:', errorText);
+				
 				return [];
 			}
 
 			const jsonResponse = (await response.json()) as GraphQLResponse;
+			
+			if (!jsonResponse.data || !jsonResponse.data.vehiclePositions) {
+				console.error('Invalid response structure:', jsonResponse);
+				return [];
+			}
+			
 			const vehicles = jsonResponse.data.vehiclePositions;
+			console.log(`Successfully fetched ${vehicles.length} vehicles`);
 
 			// Sort by train number using a robust numeric sort
 			return vehicles.sort((a, b) => {
@@ -75,6 +94,12 @@ export class EMMA {
 			});
 		} catch (error) {
 			console.error('Error fetching train data from EMMA:', error);
+			
+			// If we're in production and the CORS proxy fails, we could try alternative proxies
+			if (!dev && error instanceof TypeError && error.message.includes('Failed to fetch')) {
+				console.log('CORS proxy may be down, you might need to try a different proxy service');
+			}
+			
 			return [];
 		}
 	}
