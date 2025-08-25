@@ -16,6 +16,11 @@
     let sveaflet: any = $state(null);
     let isLoaded: boolean = $state(false);
 
+    onMount(async () => {
+        sveaflet = await import("sveaflet");
+        isLoaded = true;
+    });
+
     function getTrainIcon(train: EmmaVehiclePosition): string {
         // You can customize this based on train properties
         if (train.trip.tripShortName?.toLowerCase().includes("ic")) {
@@ -55,11 +60,6 @@
 
         return `${shortName} ${headsign}${delayText}`;
     }
-
-    onMount(async () => {
-        sveaflet = await import("sveaflet");
-        isLoaded = true;
-    });
 </script>
 
 <div class="map-container" {...rest}>

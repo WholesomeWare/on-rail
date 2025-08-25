@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { EmmaVehiclePosition } from "$lib/model/EMMATypes";
+    import type { EmmaVehiclePosition } from "$lib/model/EMMATypes";
     import { onMount } from "svelte";
 
     const { vehiclePosition, ...rest } = $props();
@@ -12,25 +12,36 @@
         isLoaded = true;
     });
 
-    function getTrainColor(train: EmmaVehiclePosition): string {
-        // Color based on delay or other properties
-        if (train.trip.arrivalStoptime?.arrivalDelay) {
-            const delay = train.trip.arrivalStoptime.arrivalDelay;
-            if (delay > 3600) return "#ff4444";
-            if (delay > 900) return "#ff8800";
-            if (delay > 300) return "#ffaa00";
+    function getTrainDelayMarkerClass(train: EmmaVehiclePosition): string {
+        const delay = train.trip.arrivalStoptime?.arrivalDelay || 0;
+        if (delay > 3600) return "delay-drastic";
+        if (delay > 900) return "delay-major";
+        if (delay > 300) return "delay-minor";
+        return "delay-none";
+    }
+
+    function getTrainIcon(train: EmmaVehiclePosition): string {
+        // You can customize this based on train properties
+        if (train.trip.tripShortName?.toLowerCase().includes("ic")) {
+            return "🚄"; // High-speed train for InterCity
+        } else if (train.trip.tripShortName?.toLowerCase().includes("ec")) {
+            return "🚅"; // High-speed train for EuroCity
+        } else if (train.label?.toLowerCase().includes("bus")) {
+            return "🚌"; // Bus for replacement services
         }
-        return "#00aa00"; // Green for on time
+        return "🚆"; // Regular train
     }
 </script>
 
 <div class="map-container" {...rest}>
     {#if !isLoaded}
-        <p>Loading map...</p>
+        <p>Térkép betöltése...</p>
+    {:else if !vehiclePosition}
+        <p>Vonat keresése...</p>
     {:else}
         <sveaflet.Map
             options={{
-                center: [47.1625, 19.5033],
+                center: [vehiclePosition.lat, vehiclePosition.lon],
                 zoom: 7,
                 zoomControl: false,
             }}
@@ -44,20 +55,20 @@
                     latLng={[vehiclePosition.lat, vehiclePosition.lon]}
                     options={{
                         title: `${vehiclePosition.trip.tripShortName} - ${vehiclePosition.trip.headsign}`,
-                        icon: sveaflet.divIcon({
-                            className: "custom-train-marker",
-                            html: `<div class="train-marker" style="background-color: ${getTrainColor(vehiclePosition)};">
-                                        🚆
-                                   </div>`,
-                            iconSize: [30, 30],
-                            iconAnchor: [15, 15],
-                        }),
                     }}
                     onclick={() => {
                         console.log("Train clicked:", vehiclePosition);
                         // You can add train detail popup here
                     }}
-                />
+                >
+                    <sveaflet.DivIcon
+                        options={{
+                            className: `custom-train-marker ${getTrainDelayMarkerClass(vehiclePosition)}`,
+                        }}
+                    >
+                        <p>{getTrainIcon(vehiclePosition)}</p>
+                    </sveaflet.DivIcon>
+                </sveaflet.Marker>
             {/if}
         </sveaflet.Map>
     {/if}
@@ -72,34 +83,32 @@
 
     /* Train marker styles */
     :global(.custom-train-marker) {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    :global(.train-marker) {
-        width: 30px;
-        height: 30px;
+        width: 32px !important;
+        height: 32px !important;
         border-radius: 50%;
-        display: flex;
+        display: flex !important;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
-        border: 2px solid white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        cursor: pointer;
-        transition: transform 0.2s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
-    :global(.train-marker:hover) {
-        transform: scale(1.1);
+    :global(.custom-train-marker.delay-none) {
+        background-color: #00aa00;
+        z-index: 1 !important;
     }
 
-    /* Responsive design */
-    @media (max-width: 768px) {
-        :global(.train-marker) {
-            width: 24px;
-            height: 24px;
-            font-size: 14px;
-        }
+    :global(.custom-train-marker.delay-minor) {
+        background-color: #ffaa00;
+        z-index: 2 !important;
+    }
+
+    :global(.custom-train-marker.delay-major) {
+        background-color: #ff8800;
+        z-index: 3 !important;
+    }
+
+    :global(.custom-train-marker.delay-drastic) {
+        background-color: #ff4444;
+        z-index: 4 !important;
     }
 </style>
