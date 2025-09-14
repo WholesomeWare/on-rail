@@ -8,6 +8,10 @@
     let gtfsId = $state("");
     let vehiclePosition: EmmaVehiclePosition | null = $state(null);
 
+    const TAB_MAP = 0;
+    const TAB_CHAT = 1;
+    let selectedTab = $state(0);
+
     onMount(() => {
         gtfsId = page.url.searchParams.get("gtfsId") || "";
 
@@ -27,7 +31,27 @@
     <TrainMap {vehiclePosition} />
 </div>
 <main>
-    
+    <div>
+        <button
+            class="leading"
+            class:toggle-off={selectedTab !== TAB_MAP}
+            onclick={() => (selectedTab = TAB_MAP)}
+        >
+            Térkép
+        </button>
+        <button
+            class="trailing"
+            class:toggle-off={selectedTab !== TAB_CHAT}
+            onclick={() => (selectedTab = TAB_CHAT)}
+        >
+            Chat
+        </button>
+    </div>
+    {#if selectedTab === TAB_CHAT}
+        <div class="surface-container card" style="flex: 1;">
+            <!-- TODO: Chat here -->
+        </div>
+    {/if}
 </main>
 
 <style>
@@ -50,5 +74,9 @@
         gap: var(--spacing);
         pointer-events: none;
         z-index: 2;
+    }
+
+    main > * {
+        pointer-events: all;
     }
 </style>
