@@ -1,4 +1,4 @@
-import { getDatabase, ref, get, set, push, remove, onChildAdded, onChildRemoved, serverTimestamp, type DataSnapshot, type Unsubscribe } from 'firebase/database';
+import { getDatabase, ref, get, set, remove, onChildAdded, onChildRemoved, serverTimestamp, type DataSnapshot, type Unsubscribe } from 'firebase/database';
 import { browser } from '$app/environment';
 import { app } from '../firebase.js';
 import type { EmmaVehiclePosition } from '../model/EMMATypes.js';
@@ -201,15 +201,16 @@ export class RTDB {
 		this.lastMessageSentTimestamp = currentTime;
 
 		try {
-			const messagePath = `chats/${chatRoomType}/${chatRoomId}`;
+			// Use timestamp as the message key (matching Android implementation)
+			const messageTimestamp = message.timestamp || currentTime;
+			const messagePath = `chats/${chatRoomType}/${chatRoomId}/${messageTimestamp}`;
 			const relevancePath = `stats/relevance/${chatRoomType}/${chatRoomId}`;
 
-			// Add message with auto-generated key
-			const messageRef = push(ref(this.database!, messagePath));
-			await set(messageRef, {
-				...message,
-				timestamp: serverTimestamp()
-			});
+			// Set message with timestamp as key
+			await set(ref(this.database!, messagePath), message);
+			
+			// Update timestamp using ServerValue
+			await set(ref(this.database!, `${messagePath}/timestamp`), serverTimestamp());
 
 			// Update relevance
 			await set(ref(this.database!, relevancePath), serverTimestamp());
@@ -224,11 +225,12 @@ export class RTDB {
 	static async removeMessage(
 		chatRoomType: ChatRoomType,
 		chatRoomId: string,
-		messageKey: string
+		message: Message
 	): Promise<boolean> {
 		this.ensureBrowser();
 		try {
-			const messagePath = `chats/${chatRoomType}/${chatRoomId}/${messageKey}`;
+			// Use message.key as the path (which should be the timestamp)
+			const messagePath = `chats/${chatRoomType}/${chatRoomId}/${message.key}`;
 			await remove(ref(this.database!, messagePath));
 			return true;
 		} catch (error) {
@@ -251,7 +253,7 @@ export class RTDB {
 			if (message) {
 				onMessageAdded({
 					...message,
-					key: snapshot.key || ''
+					key: snapshot.key || '' // snapshot.key will be the timestamp
 				});
 			}
 		});
@@ -261,7 +263,7 @@ export class RTDB {
 			if (message) {
 				onMessageRemoved({
 					...message,
-					key: snapshot.key || ''
+					key: snapshot.key || '' // snapshot.key will be the timestamp
 				});
 			}
 		});
