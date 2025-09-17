@@ -2,9 +2,9 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { RTDB, ChatRoomType } from '$lib/sources/RTDB.js';
 	import { MessageType, type Message } from '$lib/model/Message.js';
-	import { auth } from '$lib/stores/auth.js';
 	import MessageDisplay from './MessageDisplay.svelte';
 	import ChatField from './ChatField.svelte';
+    import { currentUser } from '$lib/firebase/auth.svelte';
 
 	interface Props {
 		chatRoomType: ChatRoomType;
@@ -24,7 +24,6 @@
 		onSelfColor = 'var(--onPrimary)'
 	}: Props = $props();
 
-	const user = $derived($auth);
 	let messages = $state<Message[]>([]);
 	let isLoading = $state(true);
 	let isSending = $state(false);
@@ -52,7 +51,7 @@
 	});
 
 	async function sendMessage(messageData: Omit<Message, 'key' | 'timestamp'>) {
-		if (!user || isSending) return;
+		if (!currentUser || isSending) return;
 
 		isSending = true;
 		try {
@@ -76,7 +75,7 @@
 	}
 
 	async function removeMessage(message: Message) {
-		if (!message.key || !user || message.senderId !== user.uid) return;
+		if (!message.key || !currentUser || message.senderId !== currentUser.uid) return;
 
 		try {
 			await RTDB.removeMessage(chatRoomType, chatRoomId, message);
@@ -154,7 +153,7 @@
 	</div>
 
 	<ChatField
-		enabled={!isSending && !!user}
+		enabled={!isSending && !!currentUser}
 		onSend={sendMessage}
 		{allowTrainReports}
 	/>

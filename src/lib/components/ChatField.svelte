@@ -1,6 +1,6 @@
 <script lang="ts">
+    import { currentUser } from '$lib/firebase/auth.svelte';
 	import { MessageFactory, MessageType, reportOptions, type Message } from '$lib/model/Message.js';
-	import { auth } from '$lib/stores/auth.js';
 
 	interface Props {
 		enabled?: boolean;
@@ -9,20 +9,18 @@
 	}
 
 	let { enabled = true, onSend, allowTrainReports = false }: Props = $props();
-
-	const user = $derived($auth);
 	
 	let textInput = $state('');
 	let showReportOptions = $state(false);
 	let isComposing = $state(false);
 
 	function handleSendText() {
-		if (!textInput.trim() || !user || !onSend) return;
+		if (!textInput.trim() || !currentUser || !onSend) return;
 		
 		const message: Omit<Message, 'key' | 'timestamp'> = {
 			...MessageFactory.createTextMessage(textInput.trim()),
-			senderId: user.uid,
-			senderName: user.displayName,
+			senderId: currentUser.uid,
+			senderName: currentUser.displayName || 'Névtelen utas',
 			location: ''
 		};
 		
@@ -31,12 +29,12 @@
 	}
 
 	function handleSendReport(reportTemplate: Omit<Message, 'key' | 'timestamp' | 'senderId' | 'senderName' | 'location'>) {
-		if (!user || !onSend) return;
+		if (!currentUser || !onSend) return;
 		
 		const message: Omit<Message, 'key' | 'timestamp'> = {
 			...reportTemplate,
-			senderId: user.uid,
-			senderName: user.displayName,
+			senderId: currentUser.uid,
+			senderName: currentUser.displayName || 'Névtelen utas',
 			location: ''
 		};
 		
