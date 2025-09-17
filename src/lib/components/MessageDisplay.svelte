@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentUser } from '$lib/firebase/auth.svelte';
+    import { authStore } from '$lib/firebase/auth.svelte';
 	import type { Message } from '$lib/model/Message.js';
 	import { getMessageIcon } from '$lib/model/Message.js';
 
@@ -19,7 +19,7 @@
 		onRemoveRequest 
 	}: Props = $props();
 
-	const isOwnMessage = $derived(currentUser?.uid === message.senderId);
+	const isOwnMessage = $derived(authStore.user?.uid === message.senderId);
 	const timestamp = $derived(new Date(message.timestamp));
 	const messageIcon = $derived(getMessageIcon(message));
 	

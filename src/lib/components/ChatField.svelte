@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { currentUser } from '$lib/firebase/auth.svelte';
+    import { authStore } from '$lib/firebase/auth.svelte';
 	import { MessageFactory, MessageType, reportOptions, type Message } from '$lib/model/Message.js';
 
 	interface Props {
@@ -15,12 +15,13 @@
 	let isComposing = $state(false);
 
 	function handleSendText() {
-		if (!textInput.trim() || !currentUser || !onSend) return;
+		const user = authStore.user;
+		if (!textInput.trim() || !user || !onSend) return;
 		
 		const message: Omit<Message, 'key' | 'timestamp'> = {
 			...MessageFactory.createTextMessage(textInput.trim()),
-			senderId: currentUser.uid,
-			senderName: currentUser.displayName || 'Névtelen utas',
+			senderId: user.uid,
+			senderName: user.displayName || 'Névtelen utas',
 			location: ''
 		};
 		
@@ -29,12 +30,13 @@
 	}
 
 	function handleSendReport(reportTemplate: Omit<Message, 'key' | 'timestamp' | 'senderId' | 'senderName' | 'location'>) {
-		if (!currentUser || !onSend) return;
+		const user = authStore.user;
+		if (!user || !onSend) return;
 		
 		const message: Omit<Message, 'key' | 'timestamp'> = {
 			...reportTemplate,
-			senderId: currentUser.uid,
-			senderName: currentUser.displayName || 'Névtelen utas',
+			senderId: user.uid,
+			senderName: user.displayName || 'Névtelen utas',
 			location: ''
 		};
 		

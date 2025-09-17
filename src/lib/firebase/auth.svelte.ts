@@ -3,13 +3,26 @@ import { app } from '$lib/firebase';
 
 const auth = getAuth(app);
 
-let currentUser: User | null = $state(null);
+// Create a reactive auth store
+function createAuthStore() {
+    let currentUser: User | null = $state(null);
 
-onAuthStateChanged(auth, (u) => {
-    currentUser = u;
-});
+    onAuthStateChanged(auth, (u) => {
+        currentUser = u;
+    });
 
-export { currentUser };
+    return {
+        get user() {
+            return currentUser;
+        }
+    };
+}
+
+export const authStore = createAuthStore();
+
+export function getCurrentUser(): User | null {
+    return authStore.user;
+}
 
 export async function signInWithGoogle() {
     const provider = new GoogleAuthProvider();

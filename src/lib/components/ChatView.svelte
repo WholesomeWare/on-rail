@@ -4,7 +4,7 @@
 	import { MessageType, type Message } from '$lib/model/Message.js';
 	import MessageDisplay from './MessageDisplay.svelte';
 	import ChatField from './ChatField.svelte';
-    import { currentUser } from '$lib/firebase/auth.svelte';
+    import { authStore } from '$lib/firebase/auth.svelte';
 
 	interface Props {
 		chatRoomType: ChatRoomType;
@@ -51,7 +51,8 @@
 	});
 
 	async function sendMessage(messageData: Omit<Message, 'key' | 'timestamp'>) {
-		if (!currentUser || isSending) return;
+		const user = authStore.user;
+		if (!user || isSending) return;
 
 		isSending = true;
 		try {
@@ -75,7 +76,8 @@
 	}
 
 	async function removeMessage(message: Message) {
-		if (!message.key || !currentUser || message.senderId !== currentUser.uid) return;
+		const user = authStore.user;
+		if (!message.key || !user || message.senderId !== user.uid) return;
 
 		try {
 			await RTDB.removeMessage(chatRoomType, chatRoomId, message);
@@ -153,7 +155,7 @@
 	</div>
 
 	<ChatField
-		enabled={!isSending && !!currentUser}
+		enabled={!isSending && !!authStore.user}
 		onSend={sendMessage}
 		{allowTrainReports}
 	/>
